@@ -1,4 +1,4 @@
-package com.probal.RabbitMQconsumerElasticSearch.helper;
+package com.probal.RabbitMQconsumerElasticSearch.consumer.helper;
 
 public final class MQConfigProperties {
 

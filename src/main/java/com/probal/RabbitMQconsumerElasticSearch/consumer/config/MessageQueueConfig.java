@@ -1,6 +1,6 @@
-package com.probal.RabbitMQconsumerElasticSearch.config;
+package com.probal.RabbitMQconsumerElasticSearch.consumer.config;
 
-import com.probal.RabbitMQconsumerElasticSearch.helper.MQConfigProperties;
+import com.probal.RabbitMQconsumerElasticSearch.consumer.helper.MQConfigProperties;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
