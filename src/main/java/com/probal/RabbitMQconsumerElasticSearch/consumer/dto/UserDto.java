@@ -17,6 +17,4 @@ public class UserDto {
     private String userEmail;
     private Integer userNumber;
     private Date createdDate;
-
-
 }

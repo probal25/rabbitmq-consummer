@@ -37,5 +37,4 @@ public class User {
     @Field(type = FieldType.Date, name = "createdDate")
     private Date createdDate;
 
-
 }
