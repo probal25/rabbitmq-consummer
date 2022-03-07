@@ -1,3 +1,22 @@
+/*
+*
+
+token : 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
+
+# command for elastic search [http://localhost:9200/]
+
+docker run -p 9200:9200 \
+  -e "discovery.type=single-node" \
+  docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+
+# command for rabbit mq [http://localhost:15672]
+
+docker run -d -p 5672:5672 -p 15672:15672 --name my-rabbit rabbitmq:3-management
+
+
+
+* */
+
 package com.probal.RabbitMQconsumerElasticSearch.documents.controller;
 
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.User;
