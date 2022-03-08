@@ -1,5 +1,6 @@
 package com.probal.RabbitMQconsumerElasticSearch.documents.document;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.probal.RabbitMQconsumerElasticSearch.documents.helper.Indices;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class User {
     private Integer number;
 
     @Field(type = FieldType.Date, name = "createdDate")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createdDate;
 
 }

@@ -29,7 +29,7 @@ public class MessageListener {
     }
 
     private void saveUserToElasticSearch(UserDto userDto) {
-        System.out.println("=========>Sending data to Elastic Search Index<===========");
+        log.info("=========>Sending data to Elastic Search Index<===========");
         userService.saveUserToUserIndex(userDto);
     }
 }

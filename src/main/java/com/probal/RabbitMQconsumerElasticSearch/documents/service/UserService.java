@@ -26,9 +26,12 @@ public class UserService {
             user.setId(userDto.getUserId().toString());
             user.setUsername(userDto.getUsername());
             user.setPassword(userDto.getUserPassword());
+            user.setEmail(userDto.getUserEmail());
+            user.setNumber(userDto.getUserNumber());
+            user.setCreatedDate(userDto.getCreatedDate());
 
             userDao.save(user);
-            System.out.println(userDto + " -> is saved to User Index");
+            log.info(userDto + " -> is saved to User Index");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

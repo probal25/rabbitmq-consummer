@@ -24,8 +24,11 @@ import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.SearchR
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.service.UserSearchService;
 import com.probal.RabbitMQconsumerElasticSearch.documents.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -47,8 +50,11 @@ public class UserController {
     }
 
     @PostMapping("/search")
-    public List<User> userGenericSearch(@RequestBody final SearchRequestDTO requestDTO) {
+    public List<User> userGenericSearch(@RequestBody final SearchRequestDTO requestDTO,
+                                        @RequestParam(value = "from_date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
+                                        @RequestParam(value = "to_date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate) {
 
-        searchService.userGenericSearch(requestDTO)
+        return searchService.userGenericSearch(requestDTO, fromDate, toDate);
+
     }
 }

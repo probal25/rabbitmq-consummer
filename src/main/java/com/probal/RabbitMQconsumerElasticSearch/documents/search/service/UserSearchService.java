@@ -31,12 +31,13 @@ public class UserSearchService {
         this.client = client;
     }
 
-    public List<User> userGenericSearch(final SearchRequestDTO searchRequestDTO, final Date date) {
+    public List<User> userGenericSearch(final SearchRequestDTO searchRequestDTO, final Date fromDate, final  Date toDate) {
         final SearchRequest request = SearchUtil.buildSearchRequest(
                 Indices.USER_INDEX,
                 searchRequestDTO,
                 "createdDate",
-                date);
+                fromDate,
+                toDate);
         return searchInternal(request);
     }
 

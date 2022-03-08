@@ -18,10 +18,28 @@ public class SearchUtil {
     public static SearchRequest buildSearchRequest(final String indexName,
                                                    final SearchRequestDTO searchRequestDTO,
                                                    final String field,
-                                                   final Date date) {
-        try {
+                                                   final Date fromDate,
+                                                   final Date toDate) {
+
+        if (fromDate == null || toDate == null) {
+
+            SearchSourceBuilder builder = new SearchSourceBuilder().postFilter(getQueryBuilder(searchRequestDTO));
+
+            if (searchRequestDTO.getSortBy() != null) {
+                builder = builder.sort(
+                        searchRequestDTO.getSortBy(),
+                        searchRequestDTO.getSortOrder() != null ? searchRequestDTO.getSortOrder() : SortOrder.ASC
+                );
+            }
+
+            SearchRequest request = new SearchRequest(indexName);
+            request.source(builder);
+            return request;
+
+        } else {
             final QueryBuilder searchQueryBuilder = getQueryBuilder(searchRequestDTO);
-            final QueryBuilder rangeQueryBuilder = getQueryBuilder(field, date);
+
+            final QueryBuilder rangeQueryBuilder = getQueryBuilder(field, fromDate, toDate);
 
             final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().must(searchQueryBuilder).must(rangeQueryBuilder);
             SearchSourceBuilder builder = new SearchSourceBuilder().postFilter(boolQueryBuilder);
@@ -36,9 +54,6 @@ public class SearchUtil {
             SearchRequest request = new SearchRequest(indexName);
             request.source(builder);
             return request;
-        } catch (final Exception e) {
-            e.printStackTrace();
-            return null;
         }
     }
 
@@ -69,7 +84,7 @@ public class SearchUtil {
                 ).orElse(null);
     }
 
-    public static QueryBuilder getQueryBuilder(final String field, final Date date) {
-        return QueryBuilders.rangeQuery(field).gte(date);
+    public static QueryBuilder getQueryBuilder(final String field, final Date fromDate, final Date toDate) {
+        return QueryBuilders.rangeQuery(field).gte(fromDate).lt(toDate);
     }
 }
