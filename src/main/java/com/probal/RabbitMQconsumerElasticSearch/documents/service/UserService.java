@@ -27,7 +27,7 @@ public class UserService {
             user.setUsername(userDto.getUsername());
             user.setPassword(userDto.getUserPassword());
             user.setEmail(userDto.getUserEmail());
-            user.setNumber(userDto.getUserNumber());
+            user.setNumber(userDto.getUserNumber().toString());
             user.setCreatedDate(userDto.getCreatedDate());
 
             userDao.save(user);

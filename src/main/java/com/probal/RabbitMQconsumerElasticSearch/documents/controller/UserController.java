@@ -1,26 +1,8 @@
-/*
-*
-
-token : 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
-
-# command for elastic search [http://localhost:9200/]
-
-docker run -p 9200:9200 \
-  -e "discovery.type=single-node" \
-  docker.elastic.co/elasticsearch/elasticsearch:7.10.0
-
-# command for rabbit mq [http://localhost:15672]
-
-docker run -d -p 5672:5672 -p 15672:15672 --name my-rabbit rabbitmq:3-management
-
-
-
-* */
-
 package com.probal.RabbitMQconsumerElasticSearch.documents.controller;
 
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.User;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.SearchRequestDTO;
+import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.service.UserSearchService;
 import com.probal.RabbitMQconsumerElasticSearch.documents.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,11 +32,9 @@ public class UserController {
     }
 
     @PostMapping("/search")
-    public List<User> userGenericSearch(@RequestBody final SearchRequestDTO requestDTO,
-                                        @RequestParam(value = "from_date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
-                                        @RequestParam(value = "to_date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate) {
+    public List<User> userGenericSearch(@RequestBody final UserSearchRequestDTO requestDTO) {
 
-        return searchService.userGenericSearch(requestDTO, fromDate, toDate);
+        return searchService.userGenericSearch(requestDTO);
 
     }
 }

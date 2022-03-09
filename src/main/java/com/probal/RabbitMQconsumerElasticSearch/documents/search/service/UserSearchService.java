@@ -3,8 +3,9 @@ package com.probal.RabbitMQconsumerElasticSearch.documents.search.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.User;
 import com.probal.RabbitMQconsumerElasticSearch.documents.helper.Indices;
-import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.SearchRequestDTO;
+import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.utill.SearchUtil;
+import com.probal.RabbitMQconsumerElasticSearch.documents.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -24,20 +24,23 @@ import java.util.List;
 public class UserSearchService {
 
     private final RestHighLevelClient client;
+    private final UserService userService;
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
-    public UserSearchService(RestHighLevelClient client) {
+    public UserSearchService(RestHighLevelClient client, UserService userService) {
         this.client = client;
+        this.userService = userService;
     }
 
-    public List<User> userGenericSearch(final SearchRequestDTO searchRequestDTO, final Date fromDate, final  Date toDate) {
+    public List<User> userGenericSearch(final UserSearchRequestDTO searchRequestDTO) {
+        if (searchRequestDTO.isEmpty()) {
+            return userService.getAllUserFromUserIndex();
+        }
         final SearchRequest request = SearchUtil.buildSearchRequest(
                 Indices.USER_INDEX,
-                searchRequestDTO,
-                "createdDate",
-                fromDate,
-                toDate);
+                searchRequestDTO);
         return searchInternal(request);
     }
 

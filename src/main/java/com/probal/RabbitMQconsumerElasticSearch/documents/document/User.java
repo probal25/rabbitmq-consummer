@@ -32,8 +32,8 @@ public class User {
     @Field(type = FieldType.Text, name = "email")
     private String email;
 
-    @Field(type = FieldType.Integer, name = "number")
-    private Integer number;
+    @Field(type = FieldType.Text, name = "number")
+    private String number;
 
     @Field(type = FieldType.Date, name = "createdDate")
     @JsonFormat(pattern = "yyyy-MM-dd")
