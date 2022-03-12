@@ -1,14 +1,13 @@
 package com.probal.RabbitMQconsumerElasticSearch.documents.search.utill;
 
-import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.SearchRequestDTO;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
 import lombok.NoArgsConstructor;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.util.CollectionUtils;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -82,6 +81,16 @@ public class SearchUtil {
         }*/
     }
 
+    private static BoolQueryBuilder getBoolQueryBuilder(List<MatchQueryBuilder> matchQueryBuilders) {
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        for (MatchQueryBuilder matchQueryBuilder : matchQueryBuilders) {
+            if (matchQueryBuilder != null) {
+                queryBuilder = queryBuilder.should(matchQueryBuilder);
+            }
+        }
+        return queryBuilder;
+    }
+
     private static BoolQueryBuilder getBoolQueryBuilder(UserSearchRequestDTO searchRequestDTO) {
         MatchQueryBuilder usernameMatch = null;
         MatchQueryBuilder emailMatch = null;
@@ -96,9 +105,14 @@ public class SearchUtil {
             phoneMatch = QueryBuilders.matchQuery("phone", searchRequestDTO.getPhone());
         }
 
-        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        queryBuilder.should(usernameMatch).should(emailMatch).should(phoneMatch);
-        return queryBuilder;
+        List<MatchQueryBuilder> matchQueryBuilders = new ArrayList<>();
+        matchQueryBuilders.add(usernameMatch);
+        matchQueryBuilders.add(emailMatch);
+        matchQueryBuilders.add(phoneMatch);
+
+
+        System.out.println("");
+        return getBoolQueryBuilder(matchQueryBuilders);
     }
 
 //    public static QueryBuilder getQueryBuilder(final SearchRequestDTO searchRequestDTO) {
