@@ -2,6 +2,7 @@ package com.probal.RabbitMQconsumerElasticSearch.documents.search.utill;
 
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -24,7 +25,10 @@ public class SearchUtil {
             nativeSearchQueryBuilder.withQuery(getBoolQueryBuilder(searchRequestDTO));
             return nativeSearchQueryBuilder.build();
 
-        } else if (searchRequestDTO.getEmail() == null && searchRequestDTO.getUsername() == null && searchRequestDTO.getPhone() == null) {
+
+        } else if (StringUtils.isEmpty(searchRequestDTO.getEmail())
+                && StringUtils.isEmpty(searchRequestDTO.getUsername())
+                && StringUtils.isEmpty(searchRequestDTO.getPhone())) {
 
             final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
 
@@ -72,9 +76,6 @@ public class SearchUtil {
             SearchSourceBuilder builder = new SearchSourceBuilder().postFilter(boolQueryBuilder);
 
             SearchRequest request = new SearchRequest(indexName);
-            NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-            nativeSearchQueryBuilder.withQuery(boolQueryBuilder);
-            NativeSearchQuery searchQuery = nativeSearchQueryBuilder.build();
 
             request.source(builder);
             return request;
@@ -82,38 +83,21 @@ public class SearchUtil {
 
     }
 
-    private static BoolQueryBuilder getBoolQueryBuilder(List<MatchQueryBuilder> matchQueryBuilders) {
-        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        for (MatchQueryBuilder matchQueryBuilder : matchQueryBuilders) {
-            if (matchQueryBuilder != null) {
-                queryBuilder = queryBuilder.should(matchQueryBuilder);
-            }
-        }
-        return queryBuilder;
-    }
-
     private static BoolQueryBuilder getBoolQueryBuilder(UserSearchRequestDTO searchRequestDTO) {
-        MatchQueryBuilder usernameMatch = null;
-        MatchQueryBuilder emailMatch = null;
-        MatchQueryBuilder phoneMatch = null;
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (searchRequestDTO.getUsername() != null) {
-            usernameMatch = QueryBuilders.matchQuery("username", searchRequestDTO.getUsername());
+            boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("username", searchRequestDTO.getUsername()));
         }
         if (searchRequestDTO.getEmail() != null) {
-            emailMatch = QueryBuilders.matchQuery("email", searchRequestDTO.getEmail());
+            boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("email", searchRequestDTO.getEmail()));
         }
         if (searchRequestDTO.getPhone() != null) {
-            phoneMatch = QueryBuilders.matchQuery("phone", searchRequestDTO.getPhone());
+            boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("phone", searchRequestDTO.getPhone()));
         }
 
-        List<MatchQueryBuilder> matchQueryBuilders = new ArrayList<>();
-        matchQueryBuilders.add(usernameMatch);
-        matchQueryBuilders.add(emailMatch);
-        matchQueryBuilders.add(phoneMatch);
+        return boolQueryBuilder;
 
-
-        System.out.println("");
-        return getBoolQueryBuilder(matchQueryBuilders);
     }
 
     public static QueryBuilder getQueryBuilder(final String field, final Date fromDate, final Date toDate) {
