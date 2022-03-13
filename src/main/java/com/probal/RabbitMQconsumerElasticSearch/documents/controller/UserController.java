@@ -1,5 +1,6 @@
 package com.probal.RabbitMQconsumerElasticSearch.documents.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.User;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.SearchRequestDTO;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
@@ -37,4 +38,12 @@ public class UserController {
         return searchService.userGenericSearch(requestDTO);
 
     }
+
+    @PostMapping("/search_new")
+    public List<User> userGenericSearchNew(@RequestBody final UserSearchRequestDTO requestDTO) throws JsonProcessingException {
+
+        return searchService.userGenericSearchNew(requestDTO);
+
+    }
+
 }
