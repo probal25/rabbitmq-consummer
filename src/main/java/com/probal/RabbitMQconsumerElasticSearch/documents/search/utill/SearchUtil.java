@@ -9,9 +9,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @NoArgsConstructor
 public class SearchUtil {
@@ -22,9 +20,7 @@ public class SearchUtil {
         if (searchRequestDTO.getToDate() == null && searchRequestDTO.getFromDate() == null) {
 
             NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-            nativeSearchQueryBuilder.withQuery(getBoolQueryBuilder(searchRequestDTO));
-            return nativeSearchQueryBuilder.build();
-
+            return nativeSearchQueryBuilder.withQuery(getBoolQueryBuilder(searchRequestDTO)).build();
 
         } else if (StringUtils.isEmpty(searchRequestDTO.getEmail())
                 && StringUtils.isEmpty(searchRequestDTO.getUsername())
@@ -33,8 +29,7 @@ public class SearchUtil {
             final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
 
             NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-            nativeSearchQueryBuilder.withQuery(rangeQueryBuilder);
-            return nativeSearchQueryBuilder.build();
+            return nativeSearchQueryBuilder.withQuery(rangeQueryBuilder).build();
 
         } else {
 
@@ -43,8 +38,7 @@ public class SearchUtil {
             final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().must(searchQueryBuilder).must(rangeQueryBuilder);
 
             NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-            nativeSearchQueryBuilder.withQuery(boolQueryBuilder);
-            return nativeSearchQueryBuilder.build();
+            return nativeSearchQueryBuilder.withQuery(boolQueryBuilder).build();
         }
     }
 
@@ -86,13 +80,13 @@ public class SearchUtil {
     private static BoolQueryBuilder getBoolQueryBuilder(UserSearchRequestDTO searchRequestDTO) {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        if (searchRequestDTO.getUsername() != null) {
+        if (!StringUtils.isEmpty(searchRequestDTO.getUsername())) {
             boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("username", searchRequestDTO.getUsername()));
         }
-        if (searchRequestDTO.getEmail() != null) {
+        if (!StringUtils.isEmpty(searchRequestDTO.getEmail())) {
             boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("email", searchRequestDTO.getEmail()));
         }
-        if (searchRequestDTO.getPhone() != null) {
+        if (!StringUtils.isEmpty(searchRequestDTO.getPhone())) {
             boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("phone", searchRequestDTO.getPhone()));
         }
 
