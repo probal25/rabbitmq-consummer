@@ -3,13 +3,10 @@ package com.probal.RabbitMQconsumerElasticSearch.documents.search.utill;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 
-import java.util.Date;
 
 @NoArgsConstructor
 public class SearchUtil {
