@@ -32,16 +32,13 @@ import static com.probal.RabbitMQconsumerElasticSearch.documents.helper.Indices.
 @Slf4j
 public class UserSearchService {
 
-    private final RestHighLevelClient client;
-    private final UserService userService;
+
     private final ElasticsearchOperations elasticsearchOperations;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
-    public UserSearchService(RestHighLevelClient client, UserService userService, ElasticsearchOperations elasticsearchOperations) {
-        this.client = client;
-        this.userService = userService;
+    public UserSearchService(ElasticsearchOperations elasticsearchOperations) {
         this.elasticsearchOperations = elasticsearchOperations;
     }
 
@@ -61,37 +58,4 @@ public class UserSearchService {
         return users;
     }
 
-    public List<User> userGenericSearch(final UserSearchRequestDTO searchRequestDTO) {
-        if (searchRequestDTO.isEmpty()) {
-            return userService.getAllUserFromUserIndex();
-        }
-        final SearchRequest request = SearchUtil.buildSearchRequest(
-                USER_INDEX,
-                searchRequestDTO);
-        return searchInternal(request);
-    }
-
-    private List<User> searchInternal(final SearchRequest request) {
-        if (request == null) {
-            log.error("failed to build search request");
-            return Collections.emptyList();
-        }
-
-        try {
-            final SearchResponse response = client.search(request, RequestOptions.DEFAULT);
-            final SearchHit[] searchHits = response.getHits().getHits();
-            final List<User> users = new ArrayList<>(searchHits.length);
-            for (SearchHit searchHit : searchHits) {
-                String source = searchHit.getSourceAsString();
-                users.add(
-                        MAPPER.readValue(source, User.class)
-                );
-            }
-            log.info("users found: " + users);
-            return users;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return Collections.emptyList();
-        }
-    }
 }

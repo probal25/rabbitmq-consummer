@@ -27,7 +27,6 @@ public class SearchUtil {
                 && StringUtils.isEmpty(searchRequestDTO.getPhone())) {
 
             final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
-
             NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
             return nativeSearchQueryBuilder.withQuery(rangeQueryBuilder).build();
 
@@ -40,41 +39,6 @@ public class SearchUtil {
             NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
             return nativeSearchQueryBuilder.withQuery(boolQueryBuilder).build();
         }
-    }
-
-    // For generic(bool) queries
-    public static SearchRequest buildSearchRequest(final String indexName,
-                                                   final UserSearchRequestDTO searchRequestDTO) {
-
-        if (searchRequestDTO.getToDate() == null && searchRequestDTO.getFromDate() == null) {
-
-            SearchSourceBuilder builder = new SearchSourceBuilder().postFilter(getBoolQueryBuilder(searchRequestDTO));
-
-            SearchRequest request = new SearchRequest(indexName);
-
-            request.source(builder);
-            return request;
-        } else if (searchRequestDTO.getEmail() == null && searchRequestDTO.getUsername() == null && searchRequestDTO.getPhone() == null) {
-            final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
-            SearchSourceBuilder builder = new SearchSourceBuilder().postFilter(rangeQueryBuilder);
-
-            SearchRequest request = new SearchRequest(indexName);
-            request.source(builder);
-            return request;
-        } else {
-            final QueryBuilder searchQueryBuilder = getBoolQueryBuilder(searchRequestDTO);
-
-            final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
-
-            final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().must(searchQueryBuilder).must(rangeQueryBuilder);
-            SearchSourceBuilder builder = new SearchSourceBuilder().postFilter(boolQueryBuilder);
-
-            SearchRequest request = new SearchRequest(indexName);
-
-            request.source(builder);
-            return request;
-        }
-
     }
 
     private static BoolQueryBuilder getBoolQueryBuilder(UserSearchRequestDTO searchRequestDTO) {

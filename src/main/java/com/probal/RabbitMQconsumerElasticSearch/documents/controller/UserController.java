@@ -32,13 +32,6 @@ public class UserController {
         return service.getAllUserFromUserIndex();
     }
 
-    @PostMapping("/search")
-    public List<User> userGenericSearch(@RequestBody final UserSearchRequestDTO requestDTO) {
-
-        return searchService.userGenericSearch(requestDTO);
-
-    }
-
     @PostMapping("/search_new")
     public List<User> userGenericSearchNew(@RequestBody final UserSearchRequestDTO requestDTO) throws JsonProcessingException {
 
