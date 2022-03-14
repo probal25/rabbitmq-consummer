@@ -14,31 +14,15 @@ import java.util.Date;
 @NoArgsConstructor
 public class SearchUtil {
 
+    public static final String RANGE_QUERY_FIELD = "createdDate";
+
     // new implementation for search
 
     public static NativeSearchQuery getNativeSearchQuery(final UserSearchRequestDTO searchRequestDTO) {
-        if (searchRequestDTO.getToDate() == null && searchRequestDTO.getFromDate() == null) {
 
-            NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-            return nativeSearchQueryBuilder.withQuery(getBoolQueryBuilder(searchRequestDTO)).build();
+        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+        return nativeSearchQueryBuilder.withQuery(getBoolQueryBuilder(searchRequestDTO)).build();
 
-        } else if (StringUtils.isEmpty(searchRequestDTO.getEmail())
-                && StringUtils.isEmpty(searchRequestDTO.getUsername())
-                && StringUtils.isEmpty(searchRequestDTO.getPhone())) {
-
-            final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
-            NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-            return nativeSearchQueryBuilder.withQuery(rangeQueryBuilder).build();
-
-        } else {
-
-            final QueryBuilder searchQueryBuilder = getBoolQueryBuilder(searchRequestDTO);
-            final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
-            final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().must(searchQueryBuilder).must(rangeQueryBuilder);
-
-            NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-            return nativeSearchQueryBuilder.withQuery(boolQueryBuilder).build();
-        }
     }
 
     private static BoolQueryBuilder getBoolQueryBuilder(UserSearchRequestDTO searchRequestDTO) {
@@ -53,18 +37,15 @@ public class SearchUtil {
         if (!StringUtils.isEmpty(searchRequestDTO.getPhone())) {
             boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("phone", searchRequestDTO.getPhone()));
         }
+        if (searchRequestDTO.getFromDate() != null) {
+            boolQueryBuilder = boolQueryBuilder.must(QueryBuilders.rangeQuery(RANGE_QUERY_FIELD).gte(searchRequestDTO.getFromDate()));
+        }
+        if (searchRequestDTO.getToDate() != null) {
+            boolQueryBuilder = boolQueryBuilder.must(QueryBuilders.rangeQuery(RANGE_QUERY_FIELD).lte(searchRequestDTO.getToDate()));
+        }
 
         return boolQueryBuilder;
 
     }
 
-    public static QueryBuilder getQueryBuilder(final String field, final Date fromDate, final Date toDate) {
-        if (fromDate != null && toDate == null) {
-            return QueryBuilders.rangeQuery(field).gte(fromDate);
-        }
-        if (fromDate == null && toDate != null) {
-            return QueryBuilders.rangeQuery(field).lt(toDate);
-        }
-        return QueryBuilders.rangeQuery(field).gte(fromDate).lt(toDate);
-    }
 }
