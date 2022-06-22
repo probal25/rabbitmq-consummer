@@ -2,6 +2,7 @@ package com.probal.RabbitMQconsumerElasticSearch.documents.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.User;
+import com.probal.RabbitMQconsumerElasticSearch.documents.dto.UserDto;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.SearchRequestDTO;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.service.UserSearchService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.websocket.server.PathParam;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/documents")
@@ -33,9 +35,9 @@ public class UserController {
     }
 
     @PostMapping("/search_new")
-    public List<User> userGenericSearchNew(@RequestBody final UserSearchRequestDTO requestDTO) throws JsonProcessingException {
+    public List<UserDto> userGenericSearchNew(@RequestBody final UserSearchRequestDTO requestDTO) throws JsonProcessingException {
 
-        return searchService.userGenericSearchNew(requestDTO);
+        return searchService.userGenericSearchNew(requestDTO).stream().map(UserDto::from).collect(Collectors.toList());
 
     }
 
