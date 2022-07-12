@@ -3,6 +3,7 @@ package com.probal.RabbitMQconsumerElasticSearch.documents.search.utill;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -10,6 +11,11 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @NoArgsConstructor
 public class SearchUtil {
@@ -35,7 +41,7 @@ public class SearchUtil {
 
             final QueryBuilder searchQueryBuilder = getBoolQueryBuilder(searchRequestDTO);
             final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
-            final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().must(searchQueryBuilder).must(rangeQueryBuilder);
+            final BoolQueryBuilder boolQueryBuilder = boolQuery().must(searchQueryBuilder).must(rangeQueryBuilder);
 
             NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
             return nativeSearchQueryBuilder.withQuery(boolQueryBuilder).build();
@@ -66,7 +72,7 @@ public class SearchUtil {
 
             final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
 
-            final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().must(searchQueryBuilder).must(rangeQueryBuilder);
+            final BoolQueryBuilder boolQueryBuilder = boolQuery().must(searchQueryBuilder).must(rangeQueryBuilder);
             SearchSourceBuilder builder = new SearchSourceBuilder().postFilter(boolQueryBuilder);
 
             SearchRequest request = new SearchRequest(indexName);
@@ -79,7 +85,7 @@ public class SearchUtil {
 
     private static BoolQueryBuilder getBoolQueryBuilder(UserSearchRequestDTO searchRequestDTO) {
 
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        BoolQueryBuilder boolQueryBuilder = boolQuery();
         if (!StringUtils.isEmpty(searchRequestDTO.getUsername())) {
             boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("username", searchRequestDTO.getUsername()));
         }
@@ -89,6 +95,18 @@ public class SearchUtil {
         if (!StringUtils.isEmpty(searchRequestDTO.getPhone())) {
             boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("phone", searchRequestDTO.getPhone()));
         }
+//        boolQueryBuilder = boolQueryBuilder.should(
+//                nestedQuery(
+//                        "educations",
+//                        boolQuery().must(QueryBuilders.matchQuery("educations.config.isVisible", true)),
+//                        ScoreMode.Total
+//                ));
+
+        boolQueryBuilder = boolQueryBuilder
+                .mustNot(nestedQuery("educations", termQuery("educations.config.isVisible", false), ScoreMode.Total));
+//        Map<String, Boolean> propertyValues = new HashMap<>();
+//        propertyValues.put("educations.config.isVisible", true);
+//        boolQueryBuilder = boolQueryBuilder.should(nestedBoolQuery(propertyValues, "educations"));
 
         return boolQueryBuilder;
 
@@ -102,5 +120,20 @@ public class SearchUtil {
             return QueryBuilders.rangeQuery(field).lt(toDate);
         }
         return QueryBuilders.rangeQuery(field).gte(fromDate).lt(toDate);
+    }
+
+    public static NestedQueryBuilder nestedBoolQuery(final Map<String, Boolean> propertyValues, final String nestedPath) {
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        Iterator<String> iterator = propertyValues.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            String propertyName = iterator.next();
+            Boolean propertyValue = propertyValues.get(propertyName);
+            MatchQueryBuilder matchQuery = QueryBuilders.matchQuery(propertyName, propertyValue);
+            boolQueryBuilder.must(matchQuery);
+        }
+
+        return QueryBuilders.nestedQuery(nestedPath, boolQueryBuilder, ScoreMode.Total);
     }
 }

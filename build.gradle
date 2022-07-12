@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.probal'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '13'
+sourceCompatibility = '17'
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor

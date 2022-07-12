@@ -20,7 +20,7 @@ public class MessageListener {
         this.userService = userService;
     }
 
-    @RabbitListener(queues = MQConfigProperties.USER_MESSAGE_QUEUE)
+//    @RabbitListener(queues = MQConfigProperties.USER_MESSAGE_QUEUE)
     public void listenFromMessageQueue(CustomMessage customMessage) {
 
         UserDto userDto = customMessage.getMessageBody();

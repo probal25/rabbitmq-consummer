@@ -12,6 +12,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Date;
+import java.util.List;
 
 @Document(indexName = Indices.USER_INDEX)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -23,13 +24,10 @@ public class User {
     @Field(type = FieldType.Keyword)
     private String id;
 
-    @Field(type = FieldType.Text, name = "username")
+    @Field(type = FieldType.Keyword, name = "username")
     private String username;
 
-    @Field(type = FieldType.Text, name = "password")
-    private String password;
-
-    @Field(type = FieldType.Text, name = "email")
+    @Field(type = FieldType.Keyword, name = "email")
     private String email;
 
     @Field(type = FieldType.Text, name = "number")
@@ -38,5 +36,8 @@ public class User {
     @Field(type = FieldType.Date, name = "createdDate")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date createdDate;
+
+    @Field(type = FieldType.Nested)
+    private List<Education> educations;
 
 }
