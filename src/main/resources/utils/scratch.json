@@ -1,15 +1,14 @@
-curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' -d
-'{
+curl -X GET "localhost:9200/user/_search?pretty" -H 'Content-Type: application/json' -d '{
 "query": {
 "bool": {
 "must": [
 {
 "nested": {
-"path": "educations",
+"path": "educations.config",
 "query": [
 {
 "term": {
-"educations.config.isVisible": true
+"educations.config.isVisible": "true"
 }
 }
 ]
@@ -35,6 +34,131 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 }
 }
 ]
+}
+}
+}
+'
+
+
+
+"_index": "user",
+"_type": "_doc",
+"_id": "5",
+"_score": 1.0,
+"_source": {
+"_class": "com.probal.RabbitMQconsumerElasticSearch.documents.document.User",
+"id": "5",
+"username": "gulu",
+"email": "dasdfas@dsadas",
+"number": "01988509774",
+"createdDate": "2022-07-13T03:25:40.337Z",
+"educations": [
+{
+"name": "HSC",
+"score": "5.00",
+"config": {
+"isVisible": true,
+"configName": "Ha Ha"
+}
+},
+{
+"name": "SSC",
+"score": "4.50",
+"config": {
+"isVisible": false,
+"configName": "Hi Hi"
+}
+},
+{
+"name": "BSC",
+"score": "4.00",
+"config": {
+"isVisible": true,
+"configName": "Hu Hu"
+}
+}
+]
+}
+}
+
+
+curl -X POST "localhost:9200/user/_search?pretty" -H 'Content-Type: application/json' -d '{
+
+"query": {
+"nested": {
+"path": "educations.config",
+"query": {
+"match": {
+"educations.config.isVisible": true
+}
+}
+}
+}
+}'
+
+
+{
+"id": "1",
+"username": "probal",
+"email": "dasdasdas@dsadas",
+"number": "01988509770",
+"createdDate": "2022-07-13",
+"educations": [
+{
+"name": "HSC",
+"score": "5.00",
+"config": {
+"configName": "Ha Ha",
+"visible": true
+}
+},
+{
+"name": "SSC",
+"score": "4.50",
+"config": {
+"configName": "Hi Hi",
+"visible": false
+}
+},
+{
+"name": "BSC",
+"score": "4.00",
+"config": {
+"configName": "Hu Hu",
+"visible": true
+}
+}
+]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+curl -X GET "localhost:9200/user/_search?pretty" -H 'Content-Type: application/json' -d'
+{
+"query": {
+"nested": {
+"path": "educations.config",
+"query": {
+"bool": {
+"must":
+[
+{ "match": { "educations.config.isVisible": true } }
+]
+}
+},
+"score_mode": "avg"
 }
 }
 }

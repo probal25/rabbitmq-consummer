@@ -103,10 +103,10 @@ public class SearchUtil {
 //                ));
 
         boolQueryBuilder = boolQueryBuilder
-                .mustNot(nestedQuery("educations", termQuery("educations.config.isVisible", false), ScoreMode.Total));
+                .must(nestedQuery("educations.config", termQuery("educations.config.isVisible", true), ScoreMode.Total));
 //        Map<String, Boolean> propertyValues = new HashMap<>();
 //        propertyValues.put("educations.config.isVisible", true);
-//        boolQueryBuilder = boolQueryBuilder.should(nestedBoolQuery(propertyValues, "educations"));
+//        boolQueryBuilder = boolQueryBuilder.must(nestedBoolQuery(propertyValues, "educations.config"));
 
         return boolQueryBuilder;
 
