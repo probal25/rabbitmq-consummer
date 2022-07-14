@@ -10,10 +10,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -30,7 +27,8 @@ public class SearchUtil {
 
         } else if (StringUtils.isEmpty(searchRequestDTO.getEmail())
                 && StringUtils.isEmpty(searchRequestDTO.getUsername())
-                && StringUtils.isEmpty(searchRequestDTO.getPhone())) {
+                && StringUtils.isEmpty(searchRequestDTO.getPhone())
+                && StringUtils.isEmpty(searchRequestDTO.getEduName())) {
 
             final QueryBuilder rangeQueryBuilder = getQueryBuilder("createdDate", searchRequestDTO.getFromDate(), searchRequestDTO.getToDate());
 
@@ -95,18 +93,13 @@ public class SearchUtil {
         if (!StringUtils.isEmpty(searchRequestDTO.getPhone())) {
             boolQueryBuilder = boolQueryBuilder.should(QueryBuilders.matchQuery("phone", searchRequestDTO.getPhone()));
         }
-//        boolQueryBuilder = boolQueryBuilder.should(
-//                nestedQuery(
-//                        "educations",
-//                        boolQuery().must(QueryBuilders.matchQuery("educations.config.isVisible", true)),
-//                        ScoreMode.Total
-//                ));
 
-        boolQueryBuilder = boolQueryBuilder
-                .must(nestedQuery("educations.config", termQuery("educations.config.isVisible", true), ScoreMode.Total));
-//        Map<String, Boolean> propertyValues = new HashMap<>();
-//        propertyValues.put("educations.config.isVisible", true);
-//        boolQueryBuilder = boolQueryBuilder.must(nestedBoolQuery(propertyValues, "educations.config"));
+        // Nested Match Query
+        // If I want to match the documents where the matching is occurred in nested document
+        if (!StringUtils.isEmpty(searchRequestDTO.getEduName())) {
+            boolQueryBuilder = boolQueryBuilder
+                .must(nestedQuery("educations", termQuery("educations.name", searchRequestDTO.getEduName()), ScoreMode.Total));
+        }
 
         return boolQueryBuilder;
 
@@ -135,5 +128,16 @@ public class SearchUtil {
         }
 
         return QueryBuilders.nestedQuery(nestedPath, boolQueryBuilder, ScoreMode.Total);
+    }
+
+    public static NativeSearchQuery getKeywords(String param) {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        boolQueryBuilder = boolQueryBuilder.should(
+                (nestedQuery("educations", wildcardQuery("educations.name", "*" + param + "*"), ScoreMode.Total)));
+
+        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+        return nativeSearchQueryBuilder.withQuery(boolQueryBuilder).build();
+
     }
 }

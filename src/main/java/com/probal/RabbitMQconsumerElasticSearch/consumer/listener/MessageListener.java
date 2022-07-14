@@ -21,15 +21,15 @@ public class MessageListener {
     }
 
 //    @RabbitListener(queues = MQConfigProperties.USER_MESSAGE_QUEUE)
-    public void listenFromMessageQueue(CustomMessage customMessage) {
+//    public void listenFromMessageQueue(CustomMessage customMessage) {
+//
+//        UserDto userDto = customMessage.getMessageBody();
+//        this.saveUserToElasticSearch(userDto);
+//
+//    }
 
-        UserDto userDto = customMessage.getMessageBody();
-        this.saveUserToElasticSearch(userDto);
-
-    }
-
-    private void saveUserToElasticSearch(UserDto userDto) {
-        log.info("=========>Sending data to Elastic Search Index<===========");
-        userService.saveUserToUserIndex(userDto);
-    }
+//    private void saveUserToElasticSearch(UserDto userDto) {
+//        log.info("=========>Sending data to Elastic Search Index<===========");
+//        userService.saveUserToUserIndex(userDto);
+//    }
 }

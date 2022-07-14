@@ -3,6 +3,7 @@ package com.probal.RabbitMQconsumerElasticSearch.documents.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.User;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
+import com.probal.RabbitMQconsumerElasticSearch.documents.search.response.EducationResponse;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.service.UserSearchService;
 import com.probal.RabbitMQconsumerElasticSearch.documents.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,18 @@ public class UserController {
     public ResponseEntity<?> insertValuesToES() {
         service.generateData();
         return ResponseEntity.ok("Success");
+    }
+
+    @GetMapping("/clear")
+    public ResponseEntity<?> clearValuesOfES() {
+        service.clearData();
+        return ResponseEntity.ok("Success");
+    }
+
+    @GetMapping("/keywords")
+    public ResponseEntity<?> getKeywords(@RequestParam("query") String param) throws JsonProcessingException {
+        List<EducationResponse> educationResponses = searchService.getKeywords(param);
+        return ResponseEntity.ok(educationResponses);
     }
 
     @PostMapping("/search_new")

@@ -5,6 +5,8 @@ import com.probal.RabbitMQconsumerElasticSearch.documents.document.Config;
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.Education;
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.User;
 import com.probal.RabbitMQconsumerElasticSearch.consumer.dto.UserDto;
+import com.probal.RabbitMQconsumerElasticSearch.documents.search.response.EducationResponse;
+import com.probal.RabbitMQconsumerElasticSearch.documents.search.utill.SearchUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public void saveUserToUserIndex(final UserDto userDto) {
+    public void saveUserToUserIndex(final UserDto userDto, List<Education> educations) {
         try {
             User user = new User();
             user.setId(userDto.getUserId().toString());
@@ -35,22 +37,7 @@ public class UserService {
             user.setNumber(userDto.getUserNumber());
             user.setCreatedDate(userDto.getCreatedDate());
 
-            Education education0 = new Education();
-            education0.setConfig(new Config(true, "Ha Ha"));
-            education0.setName("HSC");
-            education0.setScore("5.00");
 
-            Education education1 = new Education();
-            education1.setConfig(new Config(false, "Hi Hi"));
-            education1.setName("SSC");
-            education1.setScore("4.50");
-
-            Education education2 = new Education();
-            education2.setConfig(new Config(true, "Hu Hu"));
-            education2.setName("BSC");
-            education2.setScore("4.00");
-
-            List<Education> educations = new ArrayList<>(List.of(education0, education1, education2));
             user.setEducations(educations);
 
 
@@ -66,11 +53,40 @@ public class UserService {
         return userDao.findAll();
     }
 
-    public void generateData() {
-        saveUserToUserIndex(UserDto.builder().userId(1L).userEmail("dasdasdas@dsadas").username("probal").userNumber("01988509770").createdDate(new Date()).build());
-        saveUserToUserIndex(UserDto.builder().userId(2L).userEmail("kluhu@dsadas").username("rihan").userNumber("01988509771").createdDate(new Date()).build());
-        saveUserToUserIndex(UserDto.builder().userId(3L).userEmail("bcvbcnmcg@dsadas").username("ammu").userNumber("01988509772").createdDate(new Date()).build());
-        saveUserToUserIndex(UserDto.builder().userId(4L).userEmail("dasdbvbvbasdas@dsadas").username("abbu").userNumber("01988509773").createdDate(new Date()).build());
-        saveUserToUserIndex(UserDto.builder().userId(5L).userEmail("dasdfas@dsadas").username("gulu").userNumber("01988509774").createdDate(new Date()).build());
+    public void clearData() {
+        userDao.deleteAll();
     }
+
+    public void generateData() {
+        saveUserToUserIndex(UserDto.builder().userId(1L).userEmail("dasdasdas@dsadas").username("probal").userNumber("01988509770").createdDate(new Date()).build(),
+                List.of(
+                        generateEducation("HSC", "5.00", "Ha Ha"),
+                        generateEducation("JSC", "5.00", "Ha Ha"),
+                        generateEducation("PSC", "5.00", "Ha Ha"),
+                        generateEducation("SSC", "5.00", "Ha Ha")
+                ));
+        saveUserToUserIndex(UserDto.builder().userId(2L).userEmail("kluhu@dsadas").username("rihan").userNumber("01988509771").createdDate(new Date()).build(),
+                List.of(
+                        generateEducation("HSC", "4.00", "Ha Ha")
+                ));
+        saveUserToUserIndex(UserDto.builder().userId(3L).userEmail("bcvbcnmcg@dsadas").username("ammu").userNumber("01988509772").createdDate(new Date()).build(),
+                List.of(
+                        generateEducation("JSC", "5.00", "Ha Ha"),
+                        generateEducation("PSC", "5.00", "Ha Ha")
+                ));
+        saveUserToUserIndex(UserDto.builder().userId(4L).userEmail("dasdbvbvbasdas@dsadas").username("abbu").userNumber("01988509773").createdDate(new Date()).build(),
+                List.of(
+                        generateEducation("HSC", "5.00", "Ha Ha"),
+                        generateEducation("SSC", "5.00", "Ha Ha")
+                ));
+        saveUserToUserIndex(UserDto.builder().userId(5L).userEmail("dasdfas@dsadas").username("gulu").userNumber("01988509774").createdDate(new Date()).build(),
+                List.of(
+                        generateEducation("SSC", "5.00", "Ha Ha")
+                ));
+    }
+
+    private Education generateEducation(String name, String score, String configName) {
+        return new Education(name, score, new Config(true, configName));
+    }
+
 }

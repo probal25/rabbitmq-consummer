@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.probal.RabbitMQconsumerElasticSearch.documents.document.User;
 import com.probal.RabbitMQconsumerElasticSearch.documents.helper.Indices;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.payload.UserSearchRequestDTO;
+import com.probal.RabbitMQconsumerElasticSearch.documents.search.response.EducationResponse;
 import com.probal.RabbitMQconsumerElasticSearch.documents.search.utill.SearchUtil;
 import com.probal.RabbitMQconsumerElasticSearch.documents.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.probal.RabbitMQconsumerElasticSearch.documents.helper.Indices.USER_INDEX;
 
@@ -93,5 +95,14 @@ public class UserSearchService {
             log.error(e.getMessage(), e);
             return Collections.emptyList();
         }
+    }
+
+    public List<EducationResponse> getKeywords(String param) throws JsonProcessingException {
+        NativeSearchQuery searchQuery = SearchUtil.getKeywords(param);
+
+        List<User> users = searchInternalNew(searchQuery);
+        List<EducationResponse> educationResponses = users.stream().flatMap(user -> user.getEducations().stream()).map(EducationResponse::from)
+                .collect(Collectors.toList());
+        return educationResponses;
     }
 }

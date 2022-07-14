@@ -13,6 +13,7 @@ public class UserSearchRequestDTO {
     private String phone;
     private Date fromDate;
     private Date toDate;
+    private String eduName;
 
     public boolean isEmpty() {
         return (
@@ -21,6 +22,7 @@ public class UserSearchRequestDTO {
                 && this.phone == null
                 && this.fromDate == null
                 && this.toDate == null
+                && this.eduName == null
         );
     }
 }

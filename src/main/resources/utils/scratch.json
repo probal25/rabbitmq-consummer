@@ -151,16 +151,27 @@ curl -X GET "localhost:9200/user/_search?pretty" -H 'Content-Type: application/j
 "nested": {
 "path": "educations.config",
 "query": {
-"bool": {
-"must":
-[
-{ "match": { "educations.config.isVisible": true } }
-]
-}
+"match": {"educations.config.isVisible": true}
 },
-"score_mode": "avg"
+"inner_hits": {}
 }
 }
 }
 '
+
+curl -X GET "localhost:9200/user/_search?_source_excludes=educations" -H 'Content-Type: application/json' -d'
+{
+"query": {
+"nested": {
+"path": "educations.config",
+"query": {
+"match": {"educations.config.isVisible": true}
+},
+"inner_hits": {}
+}
+}
+}
+'
+
+
 
